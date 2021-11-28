@@ -1,8 +1,8 @@
 abstract type HeapType end
 
-function Base.size(H::HeapType)
-    return length(H.h)
-end
+Base.size(H::HeapType) =length(H.h)
+Base.getindex(H::HeapType, x::Int) = H.h[x]
+Base.setindex!(H::HeapType, x::Int, i::Int) = setindex!(H.h, x, i)
 
 struct Heap <: HeapType
     h::Vector
@@ -19,9 +19,9 @@ end
 function maxHeapify(H::Heap, i::Int)
     while 2i<=size(H)
         i′ = max_child(H,i)
-        if H.h[i] <= H.h[i′]
-            H.h[i], H.h[i′] = H.h[i′], H.h[i]
-            H.P[H.h[i]], H.P[H.h[i′]] = H.P[H.h[i′]], H.P[H.h[i]]
+        if H[i] <= H.h[i′]
+            H[i], H.h[i′] = H.h[i′], H[i]
+            H.P[H[i]], H.P[H.h[i′]] = H.P[H.h[i′]], H.P[H[i]]
         end
         i = i′
     end
@@ -60,29 +60,18 @@ function insert!(H::Heap, key::Int)
     push!(H.h, key)
     H.P[key] = size(H)
     i = size(H)
-    while i>1 && H.h[i÷2] <= H.h[i]
-        H.h[i÷2], H.h[i] = H.h[i], H.h[i÷2]
-        H.P[H.h[i÷2]], H.P[H.h[i]] = H.P[H.h[i]], H.P[H.h[i÷2]]
+    while i>1 && H.h[i÷2] <= H[i]
+        H.h[i÷2], H[i] = H[i], H.h[i÷2]
+        H.P[H.h[i÷2]], H.P[H[i]] = H.P[H[i]], H.P[H.h[i÷2]]
         i = i÷2
     end
 end
 
 function delete!(H::Heap, key::Int)
     i = H.P[key]
-    H.h[i], H.h[end] = H.h[end], H.h[i]
-    H.P[H.h[i]], H.P[H.h[end]] = H.P[H.h[end]], H.P[H.h[i]]
+    H[i], H.h[end] = H.h[end], H[i]
+    H.P[H[i]], H.P[H.h[end]] = H.P[H.h[end]], H.P[H[i]]
     pop!(H.h)
     pop!(H.P, key)
     maxHeapify(H, i)
 end
-
-# function farthestRleaf(H::Heap, i::Int)
-#     while 2i<=size(H)
-#         if 2i+1<size(H)
-#             i = 2i+1
-#         else
-#             i=2i
-#         end
-#     end
-#     return i
-# end
