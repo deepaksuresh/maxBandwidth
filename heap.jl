@@ -39,7 +39,7 @@ function max_child(H::Heap, i::Int)
     end
 end
 
-function extractMax(H::Heap)
+function extractMax!(H::Heap)
     if size(H)>0
         H.h[1], H.h[end] = H.h[end], H.h[1]
         H.P[H.h[1]], H.P[H.h[end]] = H.P[H.h[end]], H.P[H.h[1]]
@@ -56,7 +56,7 @@ function Base.maximum(H::Heap)
     return H.h[1]
 end
 
-function insert(H::Heap, key::Int)
+function insert!(H::Heap, key::Int)
     push!(H.h, key)
     H.P[key] = size(H)
     i = size(H)
@@ -67,3 +67,22 @@ function insert(H::Heap, key::Int)
     end
 end
 
+function delete!(H::Heap, key::Int)
+    i = H.P[key]
+    H.h[i], H.h[end] = H.h[end], H.h[i]
+    H.P[H.h[i]], H.P[H.h[end]] = H.P[H.h[end]], H.P[H.h[i]]
+    pop!(H.h)
+    pop!(H.P, key)
+    maxHeapify(H, i)
+end
+
+# function farthestRleaf(H::Heap, i::Int)
+#     while 2i<=size(H)
+#         if 2i+1<size(H)
+#             i = 2i+1
+#         else
+#             i=2i
+#         end
+#     end
+#     return i
+# end
