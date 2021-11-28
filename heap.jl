@@ -6,8 +6,9 @@ end
 
 struct Heap <: HeapType
     h::Vector
+    P::Dict
     function Heap(A::Vector)
-        H = new(A)
+        H = new(A, Dict(j=>i for (i,j) in enumerate(A)))
         for i=(size(H)÷2):-1:1
             maxHeapify(H, i)
         end
@@ -20,6 +21,7 @@ function maxHeapify(H::Heap, i::Int)
         i′ = max_child(H,i)
         if H.h[i] <= H.h[i′]
             H.h[i], H.h[i′] = H.h[i′], H.h[i]
+            H.P[H.h[i]], H.P[H.h[i′]] = H.P[H.h[i′]], H.P[H.h[i]]
         end
         i = i′
     end
@@ -40,6 +42,8 @@ end
 function extractMax(H::Heap)
     if size(H)>0
         H.h[1], H.h[end] = H.h[end], H.h[1]
+        H.P[H.h[1]], H.P[H.h[end]] = H.P[H.h[end]], H.P[H.h[1]]
+        pop!(H.P, H.h[end])
         max = pop!(H.h)
         maxHeapify(H, 1)
         return max
@@ -54,9 +58,11 @@ end
 
 function insert(H::Heap, key::Int)
     push!(H.h, key)
+    H.P[key] = size(H)
     i = size(H)
     while i>1 && H.h[i÷2] <= H.h[i]
         H.h[i÷2], H.h[i] = H.h[i], H.h[i÷2]
+        H.P[H.h[i÷2]], H.P[H.h[i]] = H.P[H.h[i]], H.P[H.h[i÷2]]
         i = i÷2
     end
 end
