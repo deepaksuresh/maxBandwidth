@@ -1,4 +1,3 @@
-include("generate_graph.jl")
 abstract type HeapType end
 
 Base.size(H::HeapType) = length(H.h)
@@ -78,9 +77,9 @@ function delete!(H::Heap, key::VertexType)
     maxHeapify(H, i)
 end
 
-function increase_key!(H::Heap, v::VertexType, value::Int)
+function increase_key!(H::Heap, v::VertexType, value::Float64)
     i = H.P[v.id]
-    if value<w(v)
+    if value<v.δ
         throw("new value smaller than current")
     else
         v.δ = maximum([v.δ, value])
