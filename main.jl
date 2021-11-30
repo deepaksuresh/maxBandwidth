@@ -29,7 +29,7 @@ end
 
 function Dijkstra1(G, s, t)
     initializeSource(G, s)
-    Q = Heap(copy(G.V))
+    Q = List(copy(G.V))
     while size(Q)>0
         u = extractMax!(Q)
         for v in u.adj
@@ -69,7 +69,8 @@ function Kruskal(G::GraphType, s::VertexType, t::VertexType)
     #s-t path on that tree using bfs
     T = MaxSpanning()
     e = [makeSet(v) for v in G.V]
-    sorted_edges = sort(collect(G.E), by = x->x[2], rev=true)
+    # sorted_edges = sort(collect(G.E), by = x->x[2], rev=true)
+    
     for edge_pair in sorted_edges
         edge = edge_pair[1]
         #check if edge is in tree

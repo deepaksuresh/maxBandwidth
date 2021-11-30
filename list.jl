@@ -7,6 +7,11 @@ Base.lastindex(L::ListType) = size(L)
 
 struct List<:ListType
     h::Vector{Vertex}
+    P::Dict
+    function List(A::Vector{Vertex})
+        H = new(A, Dict(j.id=>i for (i,j) in enumerate(A)))
+        return H
+    end
 end
 
 function extractMax!(L::ListType)
@@ -18,15 +23,19 @@ function extractMax!(L::ListType)
                 max = L[i]
                 ind = i
             end
-            popat!(L.h, ind)
-            return max
         end
+        L[ind], L[end] = L[end], L[ind]
+        L.P[L[ind].id], L.P[L[end].id] = L.P[L[end].id], L.P[L[ind].id]
+        pop!(L.h)
+        pop!(L.P, max.id)
+        return max
     else
         print("empty list")
     end
 end
 
 function increase_key!(L::List, v::VertexType, value::Float64)
+    i = L.P[v.id]
     if value<v.δ
         throw("new value smaller than current")
     else
