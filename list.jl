@@ -18,10 +18,7 @@ function extractMax!(L::ListType)
                 max = L[i]
                 ind = i
             end
-            L[ind], L[end] = L[end], L[ind]
-            L.P[L[ind].id], L.P[L[end].id] = L.P[L[end].id], L.P[L[ind].id]
-            pop!(L.h)
-            pop!(L.P, max.id)
+            popat!(L.h, ind)
             return max
         end
     else
@@ -30,7 +27,6 @@ function extractMax!(L::ListType)
 end
 
 function increase_key!(L::List, v::VertexType, value::Float64)
-    i = L.P[v.id]
     if value<v.δ
         throw("new value smaller than current")
     else

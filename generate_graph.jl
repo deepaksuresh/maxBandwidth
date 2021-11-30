@@ -4,18 +4,10 @@ using StatsBase
 abstract type GraphType end
 abstract type VertexType end
 abstract type EdgeType end
+abstract type TreeType end
 
 Base.isless(v1::VertexType, v2::VertexType) = v1.δ < v2.δ
 w(G::GraphType, u::VertexType, v::VertexType) = G.E[Edge(u.id,v.id)]
-
-# function Base.show(io::IO, v::VertexType)
-#     println(io, "Id $(v.id)")
-#     print("edges: ")
-#     for i in 1:length(v.adj)-1
-#         print(io,v.adj[i],", ")
-#     end
-#     print(io,v.adj[end])
-# end
 
 mutable struct Vertex<:VertexType
     id::Int
@@ -42,17 +34,31 @@ struct G1<:GraphType
     function G1()
         V = Vector{Vertex}()
         E = Dict{Edge, Int}()
-        for i = 1:5000000
+        for i = 1:5000
             push!(V, Vertex(i))
         end
 
-        for i=1:5000000
-            push!(V[i].adj, i%5000000+1)
-            E[Edge(i, i%5000000+1)] = rand(0:50)
-            tails = sample(cat(1:i-1, (i%5000000+2):5000000;dims=1),5;replace=false)
-            for tail in tails
-                E[Edge(i, tail)] = rand(0:50)
-                push!(V[i].adj, tail)
+        for i=1:5000
+            next_id = i%5000+1
+            if !haskey(E, Edge(i, next_id))
+                push!(V[i].adj, next_id)
+                push!(V[next_id].adj, i)
+                w = rand(0:50)
+                E[Edge(i, next_id)] = w
+                E[Edge(next_id, i)] = w
+            end
+            candidates = filter(x->length(V[i].adj)<7, cat(1:i-1, (i%5000+2):5000;dims=1))
+            if length(candidates)>=2
+                tails = sample(candidates,2;replace=false)
+                for tail in tails
+                    if !haskey(E, Edge(i, tail))
+                        w = rand(0:50)
+                        E[Edge(i, tail)] = w
+                        E[Edge(tail, i)] = w
+                        push!(V[i].adj, tail)
+                        push!(V[tail].adj, i)
+                    end
+                end
             end
         end
         return new(V,E)
@@ -80,3 +86,9 @@ struct G2<:GraphType
         return new(V,E)
     end
 end
+
+mutable struct MaxSpanning <: TreeType
+    E::Set{Edge}
+    MaxSpanning() = new(Set{Edge}())
+end
+
